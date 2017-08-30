@@ -58,6 +58,7 @@ vendor/bin/phpunit tests
 * [Doctrine DBAL](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html) - Database connection
 * [PHPUnit](https://phpunit.de/) - PHP testing framework
 twig
+doctrine
 
 ## Versioning
 
