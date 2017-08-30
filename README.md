@@ -15,6 +15,7 @@ Needed software in your computer to run this software:
 ```
 sudo apt-get install php7.0-cli
 sudo apt-get install php-xml
+new stuff
 ```
 
 * [composer](https://getcomposer.org/download/)
