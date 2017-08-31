@@ -2,14 +2,20 @@
 
 namespace BookingApp;
 
-use BookingApp\Controllers\CreateBookingController;
-use BookingApp\Controllers\ListBookingsController;
 use Silex\Application as SilexApplication;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\TwigServiceProvider;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 
 /**
  * Custom Application class that hold our application specifix functionality.
@@ -79,20 +85,47 @@ class Application extends SilexApplication
      */
     private function configureControllers()
     {
-        $this
-            ->match('/bookings/create', new CreateBookingController(
-                $this['form.factory'],
-                $this['twig'],
-                $this['db']
-            ))
-            ->method('GET|POST')
-            ->bind('booking_form')
-        ;
+        $this->get('/bookings/create', function () {
+            $form = $this['form.factory']->createBuilder(FormType::class)
+                ->add('firstName', TextType::class, ['required' => true])
+                ->add('lastName', TextType::class, ['required' => true])
+                ->add('phone', TextType::class, ['required' => true])
+                ->add('email', TextType::class, ['required' => false])
+                ->add('birthday', DateType::class, [
+                    'required' => true,
+                    'widget' => 'single_text',
+                    'format' => 'dd.MM.yyyy',
+                ])
+                ->add('startDate', DateType::class, [
+                    'required' => true,
+                    'widget' => 'single_text',
+                    'format' => 'dd.MM.yyyy',
+                ])
+                ->add('endDate', DateType::class, [
+                    'required' => true,
+                    'widget' => 'single_text',
+                    'format' => 'dd.MM.yyyy',
+                ])
+                ->add('arrivalTime', TimeType::class, ['required' => true])
+                ->add('nrOfPeople', IntegerType::class, ['required' => true])
+                ->add('payingMethod', ChoiceType::class, [
+                    'choices' => [
+                        'cash' => 'cash',
+                        'transfer' => 'transfer',
+                    ],
+                    'required' => true,
+                ])
+                ->add('additionalInformation', TextareaType::class, [
+                    'required' => false
+                ])
+                ->add('submit', SubmitType::class, ['label' => 'Send booking'])
+                ->getForm()
+            ;
 
-        $this
-            ->get('/bookings', new ListBookingsController($this['db'], $this['twig']))
-            ->bind('booking_list')
-        ;
+            return $this['twig']->render('form.html.twig', [
+                'form' => $form->createView()
+            ]);;
+        });
     }
 }
 ?>
